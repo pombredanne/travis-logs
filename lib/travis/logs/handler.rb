@@ -1,29 +1,24 @@
+require 'celluloid'
+
 module Travis
   module Logs
-    class  Handler
-      autoload :Log,   'travis/logs/handler/log'
-      autoload :Route, 'travis/logs/handler/route'
+    class Handler
+      autoload :Instrument, 'travis/logs/handler/instrument'
+      autoload :Pool,       'travis/logs/handler/pool'
 
-      class << self
-        def handle(type, payload)
-          payload = { 'data' => payload } unless payload.key?('data') # TODO happens when message comes directly from the worker
-          handler(type).new(payload).handle
-        end
+      extend Travis::Instrumentation
+      include Celluloid
 
-        def handler(type)
-          const_get(type.to_s.camelize)
-        end
+      attr_reader :data
+
+      def handle(data)
+        @data = data
+        Travis.uuid = data[:uuid]
+        Travis.run_service(:logs_append, data: data)
       end
+      instrument :handle
 
-      include Logging
-      extend  Instrumentation, NewRelic
-
-      attr_accessor :payload
-
-      def initialize(payload)
-        @payload = payload
-      end
+      Instrument.attach_to(self)
     end
   end
 end
-
