@@ -2,9 +2,10 @@ module Travis
   module Logs
     module Receiver
       class Test
-        attr_reader :handler
+        attr_reader :options, :handler
 
-        def intialize(handler)
+        def initialize(options, &handler)
+          @options = options
           @handler = handler
         end
 

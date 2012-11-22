@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Travis::Logs::App do
-  let(:app)     { described_class.new(shards: 5, timeout: 0.1, receivers: :test) }
+  let(:app)     { described_class.new(shards: 5, timeout: 0.1, receivers: [:test]) }
   let(:payload) { '{ "id": 8, "log": "foo", "uuid": "uuid" }' }
 
   before :each do

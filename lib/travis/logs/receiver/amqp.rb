@@ -4,16 +4,18 @@ module Travis
       class Amqp
         include Travis::Logging
 
-        attr_reader :handler
+        attr_reader :options, :handler
 
-        def initialize(&handler)
+        def initialize(options, &handler)
+          @options = options
           @handler = handler
         end
 
         def start
           info 'Subscribing to amqp ...'
           info "Subscribing to reporting.jobs.logs"
-          Travis::Amqp::Consumer.jobs('logs').subscribe(ack: true, &method(:receive))
+          logs = Travis::Amqp::Consumer.jobs('logs')
+          logs.subscribe(prefetch: options[:shards], ack: true, &method(:receive))
         end
 
         def receive(message, payload)

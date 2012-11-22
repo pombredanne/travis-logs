@@ -18,11 +18,14 @@ module Travis
       attr_reader :receivers, :handlers, :options
 
       def initialize(options = {})
-        @receivers = Array(options[:receivers] || :amqp).map do |type|
-          Receiver.for(type).new(&method(:handle))
-        end
-        @handlers = Handler::Pool.new(options[:shards] || 10)
+        options[:shards] ||= 50
+        options[:receivers] ||= [:amqp]
+
         @options = options
+        @receivers = options[:receivers].map do |type|
+          Receiver.for(type).new(options, &method(:handle))
+        end
+        @handlers = Handler::Pool.new(options[:shards])
       end
 
       def start
