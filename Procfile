@@ -1,2 +1,2 @@
-logs: bin/trinidad --rackup=config.ru --port=$PORT
+web: bin/trinidad --rackup=config.ru --port=$PORT
 
