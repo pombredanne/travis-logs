@@ -1,2 +1,2 @@
-web: bin/trinidad --rackup=config.ru --port=$PORT
+web: bundle exec trinidad --rackup=config.ru --port=$PORT
 
