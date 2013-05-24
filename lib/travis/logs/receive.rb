@@ -29,7 +29,17 @@ module Travis
       end
 
       def receive(payload)
-        Travis.run_service(:logs_receive, data: payload)
+        with_connection_and_cache do
+          Travis.run_service(:logs_receive, data: payload)
+        end
+      end
+
+      def with_connection_and_cache
+        ActiveRecord::Base.connection_pool.with_connection do
+          ActiveRecord::Base.cache do
+            yield
+          end
+        end
       end
     end
   end
